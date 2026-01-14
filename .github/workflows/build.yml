@@ -99,6 +99,7 @@ jobs:
         CC: gcc-${{ matrix.gcc }}
         CXX: g++-${{ matrix.gcc }}
       run: |
+        mkdir -p build-ci
         cmake \
           -S . \
           -B build-ci \
