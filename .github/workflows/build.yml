@@ -58,7 +58,7 @@ jobs:
         mkdir /node20196
         cd /node20196
         wget https://unofficial-builds.nodejs.org/download/release/v20.19.6/node-v20.19.6-linux-x64-glibc-217.tar.gz
-        tar -zcvf node-v20.19.6-linux-x64-glibc-217.tar.gz
+        tar -zxvf node-v20.19.6-linux-x64-glibc-217.tar.gz
         ln -s /node20196/node-v20.19.6-linux-x64-glibc-217/bin/node /__e/node20/bin/node
         ln -s /node20196/node-v20.19.6-linux-x64-glibc-217/bin/npm /__e/node20/bin/npm
         ln -s /node20196/node-v20.19.6-linux-x64-glibc-217/bin/npx /__e/node20/bin/npx
