@@ -103,6 +103,8 @@ command_result mode (color_ostream &out, vector <string> & parameters)
         else if((*iter) == "-choice")
         {    
             iter++;
+            if (iter == parameters.end())
+                return CR_WRONG_USAGE;
             selected = (*iter);
         }
         else
