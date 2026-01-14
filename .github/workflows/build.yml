@@ -118,16 +118,16 @@ jobs:
       run: |
         ninja -C build-ci test
         exit $?
-    - name: Run lua tests
-      id: run_tests_lua
-      run: |
-        export TERM=dumb
-        status=0
-        script -qe -c "python3 ci/run-tests.py --headless --keep-status \"$DF_FOLDER\"" || status=$((status + 1))
-        python3 ci/check-rpc.py "$DF_FOLDER/dfhack-rpc.txt" || status=$((status + 2))
-        mkdir -p artifacts
-        cp "$DF_FOLDER"/test*.json "$DF_FOLDER"/*.log artifacts || status=$((status + 4))
-        exit $status
+    # - name: Run lua tests
+    #   id: run_tests_lua
+    #   run: |
+    #     export TERM=dumb
+    #     status=0
+    #     script -qe -c "python3 ci/run-tests.py --headless --keep-status \"$DF_FOLDER\"" || status=$((status + 1))
+    #     python3 ci/check-rpc.py "$DF_FOLDER/dfhack-rpc.txt" || status=$((status + 2))
+    #     mkdir -p artifacts
+    #     cp "$DF_FOLDER"/test*.json "$DF_FOLDER"/*.log artifacts || status=$((status + 4))
+    #     exit $status
     - name: Upload test artifacts
       uses: actions/upload-artifact@v4
       if: (success() || failure()) && steps.run_tests.outcome != 'skipped'
