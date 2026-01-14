@@ -21,8 +21,7 @@ DFhackCExport command_result plugin_init ( color_ostream &out, std::vector <Plug
     commands.push_back(PluginCommand(
         "mode",
         "View, change and track game mode.",
-        mode,
-        true));
+        mode));
     return CR_OK;
 }
 
