@@ -31,80 +31,80 @@ DFhackCExport command_result plugin_shutdown ( color_ostream &out )
     return CR_OK;
 }
 
-void printCurrentModes(t_gamemodes gm, Console & con)
+void printCurrentModes(t_gamemodes gm, color_ostream &out)
 {
-    con << "Current game type:\t" << gm.g_type << " (";
+    out.print("Current game type:\t (");
     switch(gm.g_type)
     {
     case game_type::DWARF_MAIN:
-        con << "Fortress)" << endl;
+        out.print("Fortress)\n");
         break;
     case game_type::ADVENTURE_MAIN:
-        con << "Adventurer)" << endl;
+        out.print("Adventurer)\n");
         break;
     case game_type::VIEW_LEGENDS:
-        con << "Legends)" << endl;
+        out.print("Legends)\n");
         break;
     case game_type::DWARF_RECLAIM:
-        con << "Reclaim)" << endl;
+        out.print("Reclaim)\n");
         break;
     case game_type::DWARF_ARENA:
-        con << "Arena)" << endl;
+        out.print("Arena)\n");
         break;
     case game_type::ADVENTURE_ARENA:
-        con << "Arena - control creature)" << endl;
+        out.print("Arena - control creature)\n");
         break;
     case game_type::num:
-        con << "INVALID)" << endl;
+        out.print("INVALID)\n");
         break;
     case game_type::NONE:
-        con << "NONE)" << endl;
+        out.print("NONE)\n");
         break;
     default:
-        con << "!!UNKNOWN!!)" << endl;
+        out.print("!!UNKNOWN!!)\n");
         break;
     }
-    con << "Current game mode:\t" << gm.g_mode << " (";
+    out.print("Current game mode:\t (");
     switch (gm.g_mode)
     {
     case game_mode::DWARF:
-        con << "Dwarf)" << endl;
+        out.print("Dwarf)\n");
         break;
     case game_mode::ADVENTURE:
-        con << "Adventure)" << endl;
+        out.print("Adventure)\n");
         break;
     case game_mode::num:
-        con << "INVALID)" << endl;
+        out.print("INVALID)\n");
         break;
     case game_mode::NONE:
-        con << "NONE)" << endl;
+        out.print("NONE)\n");
         break;
     default:
-        con << "!!UNKNOWN!!)" << endl;
+        out.print("!!UNKNOWN!!)\n");
         break;
     }
 }
 
-command_result mode (color_ostream &out_, vector <string> & parameters)
+command_result mode (color_ostream &out, vector <string> & parameters)
 {
-    if(!out_.is_console())
-        return CR_FAILURE;
-    Console &out = static_cast<Console&>(out_);
-
-    string command = "";
+    string selected = "";
     bool set = false;
     bool abuse = false;
-    int rv = 0;
     t_gamemodes gm;
     for(auto iter = parameters.begin(); iter != parameters.end(); iter++)
     {
-        if((*iter) == "set")
+        if((*iter) == "-set")
         {
             set = true;
         }
-        else if((*iter) == "abuse")
+        else if((*iter) == "-abuse")
         {
             set = abuse = true;
+        }
+        else if((*iter) == "-choice")
+        {    
+            iter++;
+            selected = iter;
         }
         else
             return CR_WRONG_USAGE;
@@ -117,6 +117,13 @@ command_result mode (color_ostream &out_, vector <string> & parameters)
 
     printCurrentModes(gm, out);
 
+    out.print("\nPossible choices:\n");
+    out.print("0 = Fortress Mode\n");
+    out.print("1 = Adventurer Mode\n");
+    out.print("2 = Arena Mode\n");
+    out.print("3 = Arena, controlling creature\n");
+    out.print("4 = Reclaim Fortress Mode\n");
+
     if(set)
     {
         if(!abuse)
@@ -126,29 +133,14 @@ command_result mode (color_ostream &out_, vector <string> & parameters)
                 out.printerr("It is not safe to set modes in menus.\n");
                 return CR_FAILURE;
             }
-            out << "\nPossible choices:" << endl
-                   << "0 = Fortress Mode" << endl
-                   << "1 = Adventurer Mode" << endl
-                   << "2 = Arena Mode" << endl
-                   << "3 = Arena, controlling creature" << endl
-                   << "4 = Reclaim Fortress Mode" << endl
-                   << "c = cancel/do nothing" << endl;
             uint32_t select=99;
-
-            string selected;
-            input_again:
-            CommandHistory hist;
-            while((rv = out.lineedit("Enter new mode: ",selected, hist))
-                    == Console::RETRY);
-            if(rv <= Console::FAILURE || selected == "c")
-                return rv == Console::FAILURE ? CR_FAILURE : CR_OK;
             const char * start = selected.c_str();
             char * end = 0;
             select = strtol(start, &end, 10);
             if(!end || end==start || select > 4)
             {
                 out.printerr("This is not a valid selection.\n");
-                goto input_again;
+                return CR_FAILURE;
             }
             switch(select)
             {
@@ -176,18 +168,8 @@ command_result mode (color_ostream &out_, vector <string> & parameters)
         }
         else
         {
-            CommandHistory hist;
-            string selected;
-            while ((rv = out.lineedit("Enter new game mode number (c for exit): ",selected, hist))
-                    == Console::RETRY);
-            if(rv <= Console::FAILURE || selected == "c")
-                return rv == Console::FAILURE ? CR_FAILURE : CR_OK;
             const char * start = selected.c_str();
             gm.g_mode = (GameMode) strtol(start, 0, 10);
-            while((rv = out.lineedit("Enter new game type number (c for exit): ",selected, hist))
-                    == Console::RETRY);
-            if(rv <= Console::FAILURE || selected == "c")
-                return rv == Console::FAILURE ? CR_FAILURE : CR_OK;
             start = selected.c_str();
             gm.g_type = (GameType) strtol(start, 0, 10);
         }
@@ -197,7 +179,7 @@ command_result mode (color_ostream &out_, vector <string> & parameters)
             World::WriteGameMode(gm);
         }
 
-        out << endl;
+        out.print("\n");
     }
     return CR_OK;
 }
