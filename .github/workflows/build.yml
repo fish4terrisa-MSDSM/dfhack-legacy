@@ -52,9 +52,16 @@ jobs:
             ninja-build \
             zlib1g-dev
         pip3 install 'sphinx<4.4.0'
-        ln -s $(which node) /__e/node20/bin/node || true
-        ln -s $(which npx) /__e/node20/bin/npx || true
-        ln -s $(which npm) /__e/node20/bin/npm || true
+    - name: Replace broken node20 from github action with unofffical build
+      run: |
+        cd /
+        mkdir /node20196
+        cd /node20196
+        wget https://unofficial-builds.nodejs.org/download/release/v20.19.6/node-v20.19.6-linux-x64-glibc-217.tar.gz
+        tar -zcvf node-v20.19.6-linux-x64-glibc-217.tar.gz
+        ln -s /node20196/node-v20.19.6-linux-x64-glibc-217/bin/node /__e/node20/bin/node
+        ln -s /node20196/node-v20.19.6-linux-x64-glibc-217/bin/npm /__e/node20/bin/npm
+        ln -s /node20196/node-v20.19.6-linux-x64-glibc-217/bin/npx /__e/node20/bin/npx
     - name: Install GCC
       run: |
         sudo apt-get install -y gcc-${{ matrix.gcc }} g++-${{ matrix.gcc }}
