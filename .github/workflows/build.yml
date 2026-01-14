@@ -100,9 +100,9 @@ jobs:
         CXX: g++-${{ matrix.gcc }}
       run: |
         mkdir -p build-ci
+        cd build-ci
         cmake \
-          -S . \
-          -B build-ci \
+          .. \
           -G Ninja \
           -DDFHACK_BUILD_ARCH=64 \
           -DBUILD_TESTS:BOOL=ON \
