@@ -10,9 +10,9 @@ jobs:
       fail-fast: false
       matrix:
         os:
-        - ubuntu-18.04
+        - ubuntu-20.04
         gcc:
-        - 4.8
+        # - 4.8
         - 7
         plugins:
         - default
@@ -112,7 +112,7 @@ jobs:
         cp "$DF_FOLDER"/test*.json "$DF_FOLDER"/*.log artifacts || status=$((status + 4))
         exit $status
     - name: Upload test artifacts
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v2
       if: (success() || failure()) && steps.run_tests.outcome != 'skipped'
       continue-on-error: true
       with:
@@ -126,7 +126,7 @@ jobs:
         rm -rf "$DF_FOLDER"
 
   docs:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     steps:
     - name: Set up Python 3
       uses: actions/setup-python@v2
@@ -143,7 +143,7 @@ jobs:
       run: |
         sphinx-build -W --keep-going -j auto --color . docs/html
     - name: Upload docs
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v2
       with:
         name: docs
         path: docs/html
