@@ -4,20 +4,25 @@ on: [push, pull_request, workflow_dispatch]
 
 jobs:
   build:
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
+    container:
+      image: ${{ matrix.container }}
     name: build (Linux, GCC ${{ matrix.gcc }}, ${{ matrix.plugins }} plugins)
     strategy:
       fail-fast: false
       matrix:
         os:
-        - ubuntu-20.04
+        - ubuntu-18.04
+        container:
+        - ubuntu:18.04
         gcc:
-        # - 4.8
+        - 4.8
         - 7
         plugins:
         - default
         include:
         - os: ubuntu-22.04
+        - container: ubuntu:22.04
           gcc: 12
           plugins: all
     steps:
@@ -112,7 +117,7 @@ jobs:
         cp "$DF_FOLDER"/test*.json "$DF_FOLDER"/*.log artifacts || status=$((status + 4))
         exit $status
     - name: Upload test artifacts
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       if: (success() || failure()) && steps.run_tests.outcome != 'skipped'
       continue-on-error: true
       with:
@@ -126,7 +131,9 @@ jobs:
         rm -rf "$DF_FOLDER"
 
   docs:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
+    container:
+      image: ubuntu:18.04
     steps:
     - name: Set up Python 3
       uses: actions/setup-python@v2
@@ -143,13 +150,15 @@ jobs:
       run: |
         sphinx-build -W --keep-going -j auto --color . docs/html
     - name: Upload docs
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: docs
         path: docs/html
 
   lint:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
+    container:
+      image: ubuntu:18.04
     steps:
     - name: Set up Python 3
       uses: actions/setup-python@v2
