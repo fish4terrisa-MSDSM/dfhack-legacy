@@ -104,7 +104,7 @@ command_result mode (color_ostream &out, vector <string> & parameters)
         else if((*iter) == "-choice")
         {    
             iter++;
-            selected = iter;
+            selected = (*iter);
         }
         else
             return CR_WRONG_USAGE;
