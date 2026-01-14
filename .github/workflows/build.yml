@@ -117,7 +117,7 @@ jobs:
         cp "$DF_FOLDER"/test*.json "$DF_FOLDER"/*.log artifacts || status=$((status + 4))
         exit $status
     - name: Upload test artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: (success() || failure()) && steps.run_tests.outcome != 'skipped'
       continue-on-error: true
       with:
@@ -150,7 +150,7 @@ jobs:
       run: |
         sphinx-build -W --keep-going -j auto --color . docs/html
     - name: Upload docs
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: docs
         path: docs/html
