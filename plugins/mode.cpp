@@ -92,16 +92,13 @@ command_result mode (color_ostream &out, vector <string> & parameters)
     t_gamemodes gm;
     for(auto iter = parameters.begin(); iter != parameters.end(); iter++)
     {
-        if((*iter) == "-set")
+        if((*iter) == "-abuse")
         {
-            set = true;
-        }
-        else if((*iter) == "-abuse")
-        {
-            set = abuse = true;
+            abuse = true;
         }
         else if((*iter) == "-choice")
         {    
+            set = true;
             iter++;
             if (iter == parameters.end())
                 return CR_WRONG_USAGE;
