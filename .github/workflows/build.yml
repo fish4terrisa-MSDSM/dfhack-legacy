@@ -49,7 +49,7 @@ jobs:
             ninja-build \
             zlib1g-dev
         pip3 install 'sphinx<4.4.0'
-        sudo mount -o bind /usr/bin/node /__e/node20/bin/node || true
+        sudo mount -o bind /usr/bin /__e/node20/bin || true
     - name: Install GCC
       run: |
         sudo apt-get install -y gcc-${{ matrix.gcc }} g++-${{ matrix.gcc }}
@@ -103,7 +103,9 @@ jobs:
           -DCMAKE_INSTALL_PREFIX="$DF_FOLDER"
     - name: Build DFHack
       run: |
-        git config --global --add safe.directory /__w/dfhack-legacy
+        git config --system --add safe.directory /__w/dfhack-legacy
+        git config --system --add safe.directory /__w/dfhack-legacy/dfhack-legacy
+        git config --system --add safe.directory /__w/dfhack-legacy/dfhack-legacy/library/xml
         ninja -C build-ci install
         ccache --show-stats
     - name: Run cpp unit tests
@@ -116,7 +118,7 @@ jobs:
       run: |
         export TERM=dumb
         status=0
-        script -qe -c "python ci/run-tests.py --headless --keep-status \"$DF_FOLDER\"" || status=$((status + 1))
+        script -qe -c "python3 ci/run-tests.py --headless --keep-status \"$DF_FOLDER\"" || status=$((status + 1))
         python3 ci/check-rpc.py "$DF_FOLDER/dfhack-rpc.txt" || status=$((status + 2))
         mkdir -p artifacts
         cp "$DF_FOLDER"/test*.json "$DF_FOLDER"/*.log artifacts || status=$((status + 4))
