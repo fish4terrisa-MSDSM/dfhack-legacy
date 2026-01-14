@@ -7,6 +7,8 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: ${{ matrix.container }}
+      volumes:
+        - /tmp:/__e/node20/bin
     name: build (Linux, GCC ${{ matrix.gcc }}, ${{ matrix.plugins }} plugins)
     strategy:
       fail-fast: false
@@ -34,6 +36,7 @@ jobs:
         sudo apt-get install -y \
             ccache \
             git \
+            npm \
             nodejs \
             python3-pip \
             wget \
@@ -49,7 +52,9 @@ jobs:
             ninja-build \
             zlib1g-dev
         pip3 install 'sphinx<4.4.0'
-        sudo mount -o bind /usr/bin /__e/node20/bin || true
+        ln -s $(which node) /__e/node20/bin/node || true
+        ln -s $(which npx) /__e/node20/bin/npx || true
+        ln -s $(which npm) /__e/node20/bin/npm || true
     - name: Install GCC
       run: |
         sudo apt-get install -y gcc-${{ matrix.gcc }} g++-${{ matrix.gcc }}
