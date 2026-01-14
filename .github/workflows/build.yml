@@ -33,9 +33,9 @@ jobs:
     - name: Install dependencies
       run: |
         apt update
-        apt install sudo
+        apt install sudo -y
         sudo apt-get update
-        sudo apt-get install \
+        sudo apt-get install -y \
             ccache \
             libgtk2.0-0 \
             libncursesw5 \
@@ -50,7 +50,7 @@ jobs:
         pip install 'sphinx<4.4.0'
     - name: Install GCC
       run: |
-        sudo apt-get install gcc-${{ matrix.gcc }} g++-${{ matrix.gcc }}
+        sudo apt-get install -y gcc-${{ matrix.gcc }} g++-${{ matrix.gcc }}
     - name: Clone DFHack
       uses: actions/checkout@v1
       with:
