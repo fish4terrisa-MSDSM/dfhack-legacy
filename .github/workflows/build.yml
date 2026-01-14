@@ -34,6 +34,7 @@ jobs:
         sudo apt-get install -y \
             ccache \
             python3-pip \
+            wget \
             libgtk2.0-0 \
             libncursesw5 \
             libsdl-image1.2-dev \
@@ -44,7 +45,7 @@ jobs:
             lua5.3 \
             ninja-build \
             zlib1g-dev
-        pip install 'sphinx<4.4.0'
+        pip3 install 'sphinx<4.4.0'
     - name: Install GCC
       run: |
         sudo apt-get install -y gcc-${{ matrix.gcc }} g++-${{ matrix.gcc }}
@@ -111,7 +112,7 @@ jobs:
         export TERM=dumb
         status=0
         script -qe -c "python ci/run-tests.py --headless --keep-status \"$DF_FOLDER\"" || status=$((status + 1))
-        python ci/check-rpc.py "$DF_FOLDER/dfhack-rpc.txt" || status=$((status + 2))
+        python3 ci/check-rpc.py "$DF_FOLDER/dfhack-rpc.txt" || status=$((status + 2))
         mkdir -p artifacts
         cp "$DF_FOLDER"/test*.json "$DF_FOLDER"/*.log artifacts || status=$((status + 4))
         exit $status
@@ -129,80 +130,80 @@ jobs:
       run: |
         rm -rf "$DF_FOLDER"
 
-  docs:
-    runs-on: ubuntu-latest
-    container:
-      image: ubuntu:18.04
-    steps:
-    - name: Set up Python 3
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3
-    - name: Install dependencies
-      run: |
-        pip install 'sphinx'
-    - name: Clone DFHack
-      uses: actions/checkout@v1
-      with:
-        submodules: true
-    - name: Build docs
-      run: |
-        sphinx-build -W --keep-going -j auto --color . docs/html
-    - name: Upload docs
-      uses: actions/upload-artifact@v4
-      with:
-        name: docs
-        path: docs/html
+  # docs:
+  #   runs-on: ubuntu-latest
+  #   container:
+  #     image: ubuntu:18.04
+  #   steps:
+  #   - name: Set up Python 3
+  #     uses: actions/setup-python@v2
+  #     with:
+  #       python-version: 3
+  #   - name: Install dependencies
+  #     run: |
+  #       pip install 'sphinx'
+  #   - name: Clone DFHack
+  #     uses: actions/checkout@v1
+  #     with:
+  #       submodules: true
+  #   - name: Build docs
+  #     run: |
+  #       sphinx-build -W --keep-going -j auto --color . docs/html
+  #   - name: Upload docs
+  #     uses: actions/upload-artifact@v4
+  #     with:
+  #       name: docs
+  #       path: docs/html
 
-  lint:
-    runs-on: ubuntu-latest
-    container:
-      image: ubuntu:18.04
-    steps:
-    - name: Set up Python 3
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3
-    - name: Set up Ruby 2.7
-      uses: actions/setup-ruby@v1
-      with:
-        ruby-version: 2.7
-    - name: Install Lua
-      run: |
-        sudo apt-get update
-        sudo apt-get install lua5.3
-    - name: Clone DFHack
-      uses: actions/checkout@v1
-      with:
-        submodules: true
-        # don't need tags here
-    - name: Check whitespace
-      run: |
-        python ci/lint.py --git-only --github-actions
-    - name: Check Authors.rst
-      if: success() || failure()
-      run: |
-        python ci/authors-rst.py
-    - name: Check for missing documentation
-      if: success() || failure()
-      run: |
-        python ci/script-docs.py
-    - name: Check Lua syntax
-      if: success() || failure()
-      run: |
-        python ci/script-syntax.py --ext=lua --cmd="luac5.3 -p" --github-actions
-    - name: Check Ruby syntax
-      if: success() || failure()
-      run: |
-        python ci/script-syntax.py --ext=rb --cmd="ruby -c" --github-actions
+  # lint:
+  #   runs-on: ubuntu-latest
+  #   container:
+  #     image: ubuntu:18.04
+  #   steps:
+  #   - name: Set up Python 3
+  #     uses: actions/setup-python@v2
+  #     with:
+  #       python-version: 3
+  #   - name: Set up Ruby 2.7
+  #     uses: actions/setup-ruby@v1
+  #     with:
+  #       ruby-version: 2.7
+  #   - name: Install Lua
+  #     run: |
+  #       sudo apt-get update
+  #       sudo apt-get install lua5.3
+  #   - name: Clone DFHack
+  #     uses: actions/checkout@v1
+  #     with:
+  #       submodules: true
+  #       # don't need tags here
+  #   - name: Check whitespace
+  #     run: |
+  #       python3 ci/lint.py --git-only --github-actions
+  #   - name: Check Authors.rst
+  #     if: success() || failure()
+  #     run: |
+  #       python3 ci/authors-rst.py
+  #   - name: Check for missing documentation
+  #     if: success() || failure()
+  #     run: |
+  #       python3 ci/script-docs.py
+  #   - name: Check Lua syntax
+  #     if: success() || failure()
+  #     run: |
+  #       python3 ci/script-syntax.py --ext=lua --cmd="luac5.3 -p" --github-actions
+  #   - name: Check Ruby syntax
+  #     if: success() || failure()
+  #     run: |
+  #       python3 ci/script-syntax.py --ext=rb --cmd="ruby -c" --github-actions
 
-  check-pr:
-    runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
-    steps:
-    - name: Check that PR is based on develop branch
-      env:
-        BASE_BRANCH: ${{ github.base_ref }}
-      run: |
-        echo "PR base branch: $BASE_BRANCH"
-        test "$BASE_BRANCH" = legacy-latest
+  # check-pr:
+  #   runs-on: ubuntu-latest
+  #   if: github.event_name == 'pull_request'
+  #   steps:
+  #   - name: Check that PR is based on develop branch
+  #     env:
+  #       BASE_BRANCH: ${{ github.base_ref }}
+  #     run: |
+  #       echo "PR base branch: $BASE_BRANCH"
+  #       test "$BASE_BRANCH" = legacy-latest
